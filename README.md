@@ -1,6 +1,7 @@
 # Commands that is implemented by Python
 
 ## rpname
+<a data-flickr-embed="true" title="rpname"><img src="https://c1.staticflickr.com/4/3952/33602123605_9a5f530a21_z.jpg" alt="rpname"></a>
 
 ## fs (File stats of first layer folder structure)
-<a data-flickr-embed="true"><img src="https://c1.staticflickr.com/3/2939/33218875840_88af7da9df_z.jpg"></a>
+<a data-flickr-embed="true" title="fs"><img src="https://c1.staticflickr.com/3/2939/33218875840_88af7da9df_z.jpg" alt="fs"></a>
