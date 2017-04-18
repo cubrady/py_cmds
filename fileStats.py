@@ -1,4 +1,5 @@
 import os
+import progressbar
 
 KB = 1024
 MB = KB * 1024
@@ -8,7 +9,9 @@ def formatNumber(num):
     return "{:,}".format(num)
 
 def getFileSize(path):
-    return os.stat(path).st_size
+    if os.path.exists(path):
+        return float(os.stat(path).st_size)
+    return 0.0
 
 def formatSize(size):
     for unit, unitName in [(GB, "GB"), (MB, "MB"), (KB, "KB")]:
@@ -34,7 +37,8 @@ if __name__ == '__main__':
     maxLen = 0
     lst = os.listdir(".")
 
-    for p in lst:
+    bar = progressbar.ProgressBar()
+    for p in bar(lst):
         if os.path.isdir(p):
             if len(p) > maxLen:
                 maxLen = len(p)
@@ -53,6 +57,7 @@ if __name__ == '__main__':
 
     strFormat = "%%%ds" % maxLen
     for folder, c, s in lstResult:
-        print "%s  %8s files  %10s" % ((strFormat % folder), formatNumber(c), formatSize(s))
+        sizePercent = 0 if sumSize == 0.0 else 100 * s / sumSize
+        print "%s  %8s files  %10s %10.2f %%" % ((strFormat % folder), formatNumber(c), formatSize(s), sizePercent)
     print "=" * 20 + " Summary " + "=" * 20
     print "File count:%s, size:%s" % (formatNumber(sumCount), formatSize(sumSize))
