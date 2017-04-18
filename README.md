@@ -1,7 +1,7 @@
 # Commands that is implemented by Python
 
 ## Python Modules
-pip2 install progressbar2
+pip install progressbar2
 
 ## rpname
 <a data-flickr-embed="true" title="rpname"><img src="https://c1.staticflickr.com/4/3952/33602123605_9a5f530a21_z.jpg" alt="rpname"></a>
