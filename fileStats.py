@@ -15,7 +15,7 @@ def getFileSize(path):
 
 def formatSize(size):
     for unit, unitName in [(GB, "GB"), (MB, "MB"), (KB, "KB")]:
-        if size / unit > 0:
+        if int(size) / unit > 0:
             return "%.2f %s" % (size / float(unit), unitName)
     return "%d Bytes" % size
 
