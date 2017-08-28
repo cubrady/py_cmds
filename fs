@@ -1,3 +1,6 @@
 #!/bin/bash
 
-python ~/proj/github/cubrady/py_cmds/fileStats.py
+# https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+python "$dir/"fileStats.py
