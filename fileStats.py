@@ -1,9 +1,14 @@
 import os
 import progressbar
+import argparse
 
 KB = 1024
 MB = KB * 1024
 GB = MB * 1024
+
+SORT_BY_NAME = 0
+SORT_BY_FILE_COUNT = 1
+SORT_BY_FILE_SIZE = 2
 
 def formatNumber(num):
     return "{:,}".format(num)
@@ -30,7 +35,7 @@ def getFolderInfo(path):
 
     return (count, size)
 
-if __name__ == '__main__':
+def getFileStatas(sort_key):
     rootFileCount, rootFileSize = 0, 0
     sumSize, sumCount = 0, 0
     lstResult = []
@@ -55,9 +60,36 @@ if __name__ == '__main__':
     sumSize += rootFileSize
     sumCount += rootFileCount
 
+    lstResult = sorted(lstResult, key = lambda x : x[sort_key])
+
     strFormat = "%%%ds" % maxLen
     for folder, c, s in lstResult:
         sizePercent = 0 if sumSize == 0.0 else 100 * s / sumSize
         print "%s  %8s files  %10s %10.2f %%" % ((strFormat % folder), formatNumber(c), formatSize(s), sizePercent)
     print "=" * 20 + " Summary " + "=" * 20
     print "File count:%s, size:%s" % (formatNumber(sumCount), formatSize(sumSize))
+
+def parseKey(sort_by):
+    try:
+        key = int(sort_by)
+    except:
+        print "[Warning] Invalid argument : %s" % cmd_args.sort_by
+        key = SORT_BY_NAME
+
+    if key > SORT_BY_FILE_SIZE or key < SORT_BY_NAME:
+        print "[Warning] Unsupported sort key : %d" % key
+        key = SORT_BY_NAME
+    
+    return key
+
+if __name__ == '__main__':
+    cmd_arg_parser = argparse.ArgumentParser()
+
+    cmd_arg_parser.add_argument(
+        '-s', action='store', dest='sort_by', default="0",
+        help='Sort shown files by {0:name , 1:file counts ,2:fils size}'
+    )
+
+    cmd_args = cmd_arg_parser.parse_args()
+
+    getFileStatas(parseKey(cmd_args.sort_by))
