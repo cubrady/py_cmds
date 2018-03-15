@@ -5,7 +5,7 @@
 pip install progressbar2
 
 
-## Install
+## Setup
 Please export project path to your bashrc / zshrc  
 export PATH=PATH_TO_THIS_PROJECT:$PATH  
 Done !
