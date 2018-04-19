@@ -1,4 +1,5 @@
 import os
+import sys
 import progressbar
 import argparse
 
@@ -9,6 +10,20 @@ GB = MB * 1024
 SORT_BY_NAME = 0
 SORT_BY_FILE_COUNT = 1
 SORT_BY_FILE_SIZE = 2
+
+
+def __progressbar_pos(code):
+    '''
+    https://stackoverflow.com/questions/23113494/double-progress-bar-in-python
+    '''
+    sys.stdout.write(code)
+    sys.stdout.flush()
+
+def up_progressbar():
+    __progressbar_pos('\x1b[1A')
+
+def down_progressbar():
+    __progressbar_pos('\n')
 
 def formatNumber(num):
     return "{:,}".format(num)
@@ -28,8 +43,9 @@ def getFolderInfo(path):
     size = 0
     count = 0
     for dirPath, dirNames, fileNames in os.walk(path):
-        #print dirPath
-        for f in fileNames:
+        up_progressbar()
+        bar = progressbar.ProgressBar()
+        for f in bar(fileNames):
             size += getFileSize(os.path.join(dirPath, f))
             count += 1
 
@@ -42,6 +58,7 @@ def getFileStatas(sort_key):
     maxLen = 0
     lst = os.listdir(".")
 
+    down_progressbar()
     bar = progressbar.ProgressBar()
     for p in bar(lst):
         if os.path.isdir(p):
