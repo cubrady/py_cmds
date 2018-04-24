@@ -33,11 +33,6 @@ if [ -d $CUDA_PATH ]; then
         echo "You are already in use of Cuda"$NVCC_VER_D
     else
         echo "Switching to Cuda "$full_tar_ver" ..."
-        #echo "/usr/local/cuda-"$tar_cuda_ver " Exist !!"
-	#sudo mv /usr/local/cuda /usr/local/cuda-temp
-	#sudo mv "/usr/local/cuda-"$tar_cuda_ver /usr/local/cuda
-	#sudo mv /usr/local/cuda-temp "/usr/local/cuda-"$current_ver
-	#echo "sudo ln -sfn "$CUDA_PATH" /usr/local/cuda"
 	sudo ln -sfn $CUDA_PATH /usr/local/cuda
         echo "Switch to Cuda" $tar_cuda_ver " Success !!"
     fi
