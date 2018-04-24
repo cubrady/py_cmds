@@ -11,7 +11,7 @@ V91="V9.1"
 V90="V9.0"
 V80="V8.0"
 
-current_ver = ""
+current_ver=""
 
 if [[ $NVCC_VER_D == *"$V90"* ]]; then
     read -p "Switch to (8.0 / 9.1) ? " tar_cuda_ver
@@ -23,8 +23,6 @@ elif [[ $NVCC_VER_D == *"$V91"* ]]; then
     read -p "Switch to (8.0 / 9.0) ? " tar_cuda_ver
     current_ver="9.1"
 fi
-
-#echo "Switch to Cuda V" $tar_cuda_ver " ..."
 
 CUDA_PATH="/usr/local/cuda-"$tar_cuda_ver
 if [ -d $CUDA_PATH ]; then
