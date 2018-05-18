@@ -51,25 +51,33 @@ def getFolderInfo(path):
 
     return (count, size)
 
-def getFileStatas(sort_key):
+def getFileStatas(sort_key, path):
     rootFileCount, rootFileSize = 0, 0
     sumSize, sumCount = 0, 0
     lstResult = []
     maxLen = 0
-    lst = os.listdir(".")
+
+    file_list = []
+    if not path:
+        file_list = os.listdir(".")
+    elif os.path.isfile(path):
+        file_list = [path]
+    else:
+        file_list = os.listdir(path)
 
     down_progressbar()
     bar = progressbar.ProgressBar()
-    for p in bar(lst):
-        if os.path.isdir(p):
-            if len(p) > maxLen:
-                maxLen = len(p)
-            c, s = getFolderInfo(p)
-            lstResult.append((p, c, s))
+    for p in bar(file_list):
+        full_path = os.path.join(path, p)
+        if os.path.isdir(full_path):
+            if len(full_path) > maxLen:
+                maxLen = len(full_path)
+            c, s = getFolderInfo(full_path)
+            lstResult.append((full_path, c, s))
             sumSize += s
             sumCount += c
         else:
-            rootFileSize += getFileSize(p)
+            rootFileSize += getFileSize(full_path)
             rootFileCount += 1
 
     lstResult.insert(0, ("..", rootFileCount, rootFileSize))
@@ -107,6 +115,11 @@ if __name__ == '__main__':
         help='Sort shown files by {0:name , 1:file counts ,2:fils size}'
     )
 
+    cmd_arg_parser.add_argument(
+        '-p', action='store', dest='path', default="",
+        help='Show the file status of specified path instead of current directory'
+    )
+
     cmd_args = cmd_arg_parser.parse_args()
 
-    getFileStatas(parseKey(cmd_args.sort_by))
+    getFileStatas(parseKey(cmd_args.sort_by), path = cmd_args.path)
