@@ -2,6 +2,7 @@ import os
 import sys
 import progressbar
 import argparse
+from natsort import natsorted
 
 KB = 1024
 MB = KB * 1024
@@ -10,6 +11,8 @@ GB = MB * 1024
 SORT_BY_NAME = 0
 SORT_BY_FILE_COUNT = 1
 SORT_BY_FILE_SIZE = 2
+SORT_BY_AVG_FILE_SIZE = 3
+__KEYS = [SORT_BY_NAME, SORT_BY_FILE_COUNT, SORT_BY_FILE_SIZE, SORT_BY_AVG_FILE_SIZE]
 
 
 def __progressbar_pos(code):
@@ -25,36 +28,38 @@ def up_progressbar():
 def down_progressbar():
     __progressbar_pos('\n')
 
-def formatNumber(num):
+def format_number(num):
     return "{:,}".format(num)
 
-def getFileSize(path):
+def get_file_size(path):
     if os.path.exists(path):
         return float(os.stat(path).st_size)
     return 0.0
 
-def formatSize(size):
+def format_size(size):
     for unit, unitName in [(GB, "GB"), (MB, "MB"), (KB, "KB")]:
         if int(size) / unit > 0:
-            return "%.2f %s" % (size / float(unit), unitName)
+            size_unit = size / float(unit)
+            formatter = "%.1f %s" if size_unit > 100. else "%.2f %s"
+            return formatter % (size_unit, unitName)
     return "%d Bytes" % size
 
-def getFolderInfo(path):
+def get_folder_info(path):
     size = 0
     count = 0
-    for dirPath, dirNames, fileNames in os.walk(path):
+    for dir_path, _, file_names in os.walk(path):
         up_progressbar()
         bar = progressbar.ProgressBar()
-        for f in bar(fileNames):
-            size += getFileSize(os.path.join(dirPath, f))
+        for f in bar(file_names):
+            size += get_file_size(os.path.join(dir_path, f))
             count += 1
 
     return (count, size)
 
-def getFileStatas(sort_key, path):
-    rootFileCount, rootFileSize = 0, 0
-    sumSize, sumCount = 0, 0
-    lstResult = []
+def get_file_statas(sort_key, path):
+    root_file_count, root_file_size = 0, 0
+    sum_size, sum_count = 0, 0
+    lst_result = []
     maxLen = 0
 
     file_list = []
@@ -65,6 +70,14 @@ def getFileStatas(sort_key, path):
     else:
         file_list = os.listdir(path)
 
+    def __add_folder_info(full_path, file_count, file_size, insert_idx = -1):
+        info = [full_path, file_count, file_size]
+        info.append(file_size / float(file_count) if file_count != 0 else 0.)
+        if insert_idx != -1:
+            lst_result.insert(insert_idx, info)
+        else:
+            lst_result.append(info)
+
     down_progressbar()
     bar = progressbar.ProgressBar()
     for p in bar(file_list):
@@ -72,27 +85,28 @@ def getFileStatas(sort_key, path):
         if os.path.isdir(full_path):
             if len(full_path) > maxLen:
                 maxLen = len(full_path)
-            c, s = getFolderInfo(full_path)
-            lstResult.append((full_path, c, s))
-            sumSize += s
-            sumCount += c
+            file_count, file_size = get_folder_info(full_path)
+            __add_folder_info(full_path, file_count, file_size)
+            sum_size += file_size
+            sum_count += file_count
         else:
-            rootFileSize += getFileSize(full_path)
-            rootFileCount += 1
+            root_file_size += get_file_size(full_path)
+            root_file_count += 1
 
-    lstResult.insert(0, ("..", rootFileCount, rootFileSize))
+    __add_folder_info("..", root_file_count, root_file_size, insert_idx = 0)
 
-    sumSize += rootFileSize
-    sumCount += rootFileCount
+    sum_size += root_file_size
+    sum_count += root_file_count
 
-    lstResult = sorted(lstResult, key = lambda x : x[sort_key])
+    lst_result = natsorted(lst_result, key = lambda x : x[sort_key])
 
     strFormat = "%%%ds" % maxLen
-    for folder, c, s in lstResult:
-        sizePercent = 0 if sumSize == 0.0 else 100 * s / sumSize
-        print "%s  %8s files  %10s %10.2f %%" % ((strFormat % folder), formatNumber(c), formatSize(s), sizePercent)
-    print "=" * 20 + " Summary " + "=" * 20
-    print "File count:%s, size:%s" % (formatNumber(sumCount), formatSize(sumSize))
+    print ("%s %14s %13s %13s %12s" % (strFormat % "Folder", "File Count", "Files Size", "Averege", "Ratio"))
+    for folder, c, s, avg_size in lst_result:
+        sizePercent = 0 if sum_size == 0.0 else 100 * s / sum_size
+        print ("%s  %8s files  %13s %13s %10.2f %%" % ((strFormat % folder), format_number(c), format_size(s), format_size(avg_size), sizePercent))
+    print ("=" * 40 + " Summary " + "=" * 40)
+    print ("File count:%s, size:%s, avg:%s" % (format_number(sum_count), format_size(sum_size), format_size(sum_size/sum_count)))
 
 def parseKey(sort_by):
     try:
@@ -101,7 +115,7 @@ def parseKey(sort_by):
         print "[Warning] Invalid argument : %s" % cmd_args.sort_by
         key = SORT_BY_NAME
 
-    if key > SORT_BY_FILE_SIZE or key < SORT_BY_NAME:
+    if key not in __KEYS:
         print "[Warning] Unsupported sort key : %d" % key
         key = SORT_BY_NAME
     
@@ -112,7 +126,7 @@ if __name__ == '__main__':
 
     cmd_arg_parser.add_argument(
         '-s', action='store', dest='sort_by', default="0",
-        help='Sort shown files by {0:name , 1:file counts ,2:fils size}'
+        help='Sort shown files by {0:name, 1:file counts, 2:fils size, 3:average file size}'
     )
 
     cmd_arg_parser.add_argument(
@@ -122,4 +136,4 @@ if __name__ == '__main__':
 
     cmd_args = cmd_arg_parser.parse_args()
 
-    getFileStatas(parseKey(cmd_args.sort_by), path = cmd_args.path)
+    get_file_statas(parseKey(cmd_args.sort_by), path = cmd_args.path)
