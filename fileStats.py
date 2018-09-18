@@ -105,8 +105,9 @@ def get_file_statas(sort_key, path):
     for folder, c, s, avg_size in lst_result:
         sizePercent = 0 if sum_size == 0.0 else 100 * s / sum_size
         print ("%s  %8s files  %13s %13s %10.2f %%" % ((strFormat % folder), format_number(c), format_size(s), format_size(avg_size), sizePercent))
+    avg_size = sum_size / sum_count if sum_count > 0. else 0.
     print ("=" * 40 + " Summary " + "=" * 40)
-    print ("File count:%s, size:%s, avg:%s" % (format_number(sum_count), format_size(sum_size), format_size(sum_size/sum_count)))
+    print ("File count:%s, size:%s, avg:%s" % (format_number(sum_count), format_size(sum_size), format_size(avg_size)))
 
 def parseKey(sort_by):
     try:
