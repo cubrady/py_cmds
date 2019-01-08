@@ -2,7 +2,7 @@
 
 
 ## Python Modules
-pip install progressbar2
+pip install progressbar2 && pip install natsort
 
 
 ## Setup
