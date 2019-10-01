@@ -12,9 +12,9 @@ def replaceName(src, dst):
 			os.rename(f, f.replace(src, dst))
 
 	if count > 0:
-		print "%d files renamed " % count
+		print ("%d files renamed " % count)
 	else:
-		print "Nothing to rename !"
+		print ("Nothing to rename !")
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Python renaming tool')
@@ -23,7 +23,7 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	if not args.src:
-		print "[Err] Arguments error, must specify what to rename !"
+		print ("[Err] Arguments error, must specify what to rename !")
 	else:
-		print "Rename files that contain '%s' to '%s'" % (args.src, args.dst)
+		print ("Rename files that contain '%s' to '%s'" % (args.src, args.dst))
 		replaceName(args.src, args.dst)

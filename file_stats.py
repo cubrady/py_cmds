@@ -113,11 +113,11 @@ def parseKey(sort_by):
     try:
         key = int(sort_by)
     except:
-        print "[Warning] Invalid argument : %s" % cmd_args.sort_by
+        print ("[Warning] Invalid argument : %s" % cmd_args.sort_by)
         key = SORT_BY_NAME
 
     if key not in __KEYS:
-        print "[Warning] Unsupported sort key : %d" % key
+        print ("[Warning] Unsupported sort key : %d" % key)
         key = SORT_BY_NAME
     
     return key
